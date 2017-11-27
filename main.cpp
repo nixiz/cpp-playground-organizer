@@ -45,7 +45,7 @@ std::vector<IPlaygroundObj> CppOrganizer::_default_objects = { CommaOperatorTest
 int main(int argc, char *argv[]) {
   PlaygroundOrganizer po;
 
-  po.Initialize();
+  po.Insert();
   po.PrintDetails();
 
 
