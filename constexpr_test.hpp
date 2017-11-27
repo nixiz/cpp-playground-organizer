@@ -19,7 +19,7 @@ namespace CppOrganizer
     ConstExprTest();
     ~ConstExprTest();
 
-    void RunTest() {
+    void Run() {
       int i = factorial(5);
       int ii = factorial(mutliplyWithDouble(5));
     }
@@ -42,7 +42,7 @@ namespace CppOrganizer
     StrangeOperatorTest();
     ~StrangeOperatorTest();
 
-    void RunTest() {
+    void Run() {
       int x = 10;
       while (x--> 0) // x goes to 0
       {

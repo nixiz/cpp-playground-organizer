@@ -1,6 +1,11 @@
 #ifndef _CPP_Playground_ORGANIZER_HPP_
 #define _CPP_Playground_ORGANIZER_HPP_
 
+#define Stringize( L )     #L 
+#define MakeString( M, L ) M(L)
+#define $Line MakeString( Stringize, __LINE__ )
+#define PrintError __FILE__ "(" $Line ") : Error: "
+
 #include <iostream>
 #include <sstream>      // std::ostringstream
 #include <functional>
@@ -10,15 +15,23 @@
 #include <chrono>
 #include <thread>
 
+#ifndef COMPILE_WITH_UNIMPLEMENTED_RUNNER
+#define COMPILE_WITH_UNIMPLEMENTED_RUNNER 1
+#endif // !COMPILE_WITH_UNIMPLEMENTED_RUNNER
+
 namespace CppOrganizer
 {
+  class PlaygroundOrganizer;
   struct ICodeRunnerIdentifier
   {
-    ICodeRunnerIdentifier() : id(quest_id++) {}
+  public:
+    explicit ICodeRunnerIdentifier(const std::string& _name) : id(quest_id++), name(_name) {}
     int id;
-    std::string name;
+  protected:
     std::function<void()> run_method;
+    std::string name;
   private:
+    friend class PlaygroundOrganizer;
     static int quest_id;
   };
   int ICodeRunnerIdentifier::quest_id = 0;
@@ -33,26 +46,35 @@ namespace CppOrganizer
   {
   public: 
     CodeRunnerHelper() = delete; // delete default ctor, only accepted named 
-    explicit CodeRunnerHelper(const std::string& testName)
+    explicit CodeRunnerHelper(const std::string& testName) : ICodeRunnerIdentifier(testName)
     {
-      name = testName;
-      run_method = std::bind(&CodeRunnerHelper::Run, this);
+      run_method = std::bind(&CodeRunnerHelper::RunCode, this);
     }
 
-    void Run() {
+    void RunCode() {
       typedef std::chrono::high_resolution_clock clock;
       typedef std::chrono::duration<double, std::micro> duration;
 
       clock::time_point start = clock::now();
-      static_cast<T *>(this)->RunTest();
-      duration elapsed = clock::now() - start;
-      printf("\nTest[%d]:%s completed in %f us", id, name.c_str(), elapsed.count());
+      try
+      {
+        //#pragma message(PrintError "Fix this problem!") 
+        static_cast<T *>(this)->Run();
+        duration elapsed = clock::now() - start;
+        printf("\nCode[%d]:%s completed in %f us", id, name.c_str(), elapsed.count());
+      }
+      catch (const std::exception& ex)
+      {
+        printf("\nCode[%d]:%s failed to execute!\nException message:\n%s", id, name.c_str(), ex.what());
+      }
     }
 
   protected:
-    void RunTest() {
-      std::cout << "Test is not implemented yet!" << std::endl;
+#if COMPILE_WITH_UNIMPLEMENTED_RUNNER == 1
+    void Run() {
+      std::cout << "Code block is not implemented yet!" << std::endl;
     }
+#endif
   };
 
   class PlaygroundOrganizer
