@@ -53,3 +53,4 @@ inc/
 # Visual Studio Code cache/options directory
 .vscode/
 
+*.TMP

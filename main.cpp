@@ -3,7 +3,7 @@
 
 using namespace CppOrganizer;
 
-class DummyTestClass : public PlaygroundHelper<DummyTestClass>
+class DummyTestClass : public CodeRunnerHelper<DummyTestClass>
 {
 public:
   DummyTestClass();
@@ -13,7 +13,7 @@ public:
 
 };
 
-DummyTestClass::DummyTestClass() : PlaygroundHelper("Sample Test Class")
+DummyTestClass::DummyTestClass() : CodeRunnerHelper("Sample Test Class")
 {
 }
 
@@ -27,10 +27,10 @@ void DummyTestClass::RunTest()
 }
 
 
-class CommaOperatorTest : public PlaygroundHelper<CommaOperatorTest>
+class CommaOperatorTest : public CodeRunnerHelper<CommaOperatorTest>
 {
 public:
-  CommaOperatorTest() : PlaygroundHelper("CommaOperatorTest") {}
+  CommaOperatorTest() : CodeRunnerHelper("CommaOperatorTest") {}
   ~CommaOperatorTest() = default;
 
   void RunTest() {
@@ -40,7 +40,12 @@ public:
 
 };
 
-std::vector<IPlaygroundObj> CppOrganizer::_default_objects = { CommaOperatorTest(), ConstExprTest(), StrangeOperatorTest() };
+std::vector<ICodeRunnerIdentifierPtr> CppOrganizer::_default_objects = 
+{ 
+  std::make_shared<CommaOperatorTest>(),
+  std::make_shared<StrangeOperatorTest>(),
+  std::make_shared<ConstExprTest>()
+};
 
 int main(int argc, char *argv[]) {
   PlaygroundOrganizer po;
@@ -48,8 +53,8 @@ int main(int argc, char *argv[]) {
   po.Insert();
   po.PrintDetails();
 
-
-  po.Run(po.All());
+  po.RunAll();
+  //po.RunWithID(po.All());
 
   return EXIT_SUCCESS;
 }

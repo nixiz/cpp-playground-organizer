@@ -13,7 +13,7 @@ namespace CppOrganizer
     return i * 2;
   }
 
-  class ConstExprTest : public PlaygroundHelper<ConstExprTest>
+  class ConstExprTest : public CodeRunnerHelper<ConstExprTest>
   {
   public:
     ConstExprTest();
@@ -28,7 +28,7 @@ namespace CppOrganizer
 
   };
 
-  ConstExprTest::ConstExprTest() : PlaygroundHelper("ConstExprTest")
+  ConstExprTest::ConstExprTest() : CodeRunnerHelper("ConstExprTest")
   {
   }
 
@@ -36,7 +36,7 @@ namespace CppOrganizer
   {
   }
 
-  class StrangeOperatorTest : public PlaygroundHelper<StrangeOperatorTest>
+  class StrangeOperatorTest : public CodeRunnerHelper<StrangeOperatorTest>
   {
   public:
     StrangeOperatorTest();
@@ -54,7 +54,7 @@ namespace CppOrganizer
   };
 
   StrangeOperatorTest::StrangeOperatorTest() : 
-    PlaygroundHelper("Strange Operator \"-->\" Test")
+    CodeRunnerHelper("Strange Operator \"-->\" Test")
   {
 
   }

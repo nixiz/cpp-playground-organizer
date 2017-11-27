@@ -8,33 +8,35 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <thread>
 
 namespace CppOrganizer
 {
-  struct IPlaygroundObj
+  struct ICodeRunnerIdentifier
   {
-    IPlaygroundObj() : id(quest_id++) {}
+    ICodeRunnerIdentifier() : id(quest_id++) {}
     int id;
     std::string name;
     std::function<void()> run_method;
   private:
     static int quest_id;
   };
-  int IPlaygroundObj::quest_id = 0;
+  int ICodeRunnerIdentifier::quest_id = 0;
+  typedef std::shared_ptr<ICodeRunnerIdentifier> ICodeRunnerIdentifierPtr;
   
-  typedef std::map<int, IPlaygroundObj> IPlaygroundObjMap;
+  typedef std::map<int, ICodeRunnerIdentifierPtr> IPlaygroundObjMap;
 
-  extern std::vector<IPlaygroundObj> _default_objects;
+  extern std::vector<ICodeRunnerIdentifierPtr> _default_objects;
  
   template <class T>
-  class PlaygroundHelper : public IPlaygroundObj
+  class CodeRunnerHelper : public ICodeRunnerIdentifier
   {
   public: 
-    PlaygroundHelper() = delete; // delete default ctor, only accepted named 
-    explicit PlaygroundHelper(const std::string& testName)
+    CodeRunnerHelper() = delete; // delete default ctor, only accepted named 
+    explicit CodeRunnerHelper(const std::string& testName)
     {
       name = testName;
-      run_method = std::bind(&PlaygroundHelper::Run, this);
+      run_method = std::bind(&CodeRunnerHelper::Run, this);
     }
 
     void Run() {
@@ -44,7 +46,7 @@ namespace CppOrganizer
       clock::time_point start = clock::now();
       static_cast<T *>(this)->RunTest();
       duration elapsed = clock::now() - start;
-      std::cout << "Total execution time as us: " << elapsed.count() << std::endl;
+      printf("\nTest[%d]:%s completed in %f us", id, name.c_str(), elapsed.count());
     }
 
   protected:
@@ -59,22 +61,35 @@ namespace CppOrganizer
     PlaygroundOrganizer() = default;
     ~PlaygroundOrganizer() = default;
 
-    void Insert(const std::vector<IPlaygroundObj>& pg_objects = _default_objects)
+    void Insert(const std::vector<ICodeRunnerIdentifierPtr>& pg_objects = _default_objects)
     {
+      for (auto q : pg_objects)
+      {
+        pg_map.insert(std::make_pair(q->id, q));
+      }
+      /*
       // populate question map.
       std::for_each(
         pg_objects.begin(),
         pg_objects.end(),
         [&](auto q) {
-          pg_map.insert(std::make_pair(q.id, q));
+          pg_map.insert(std::make_pair(q->id, q));
         });
+      */
     }
 
-    void Run(const std::vector<int>& pg_objects)
+    void RunWithID(const std::vector<int>& pg_objects)
     {
       for (auto id : pg_objects) {
         if (pg_map.find(id) == pg_map.end()) continue;
-        pg_map[id].run_method();
+        pg_map[id]->run_method();
+      }
+    }
+
+    void RunAll()
+    {
+      for (auto pg : pg_map) {
+        pg.second->run_method();
       }
     }
 
@@ -86,19 +101,19 @@ namespace CppOrganizer
     }
 
     std::string GetQuestionName(int id) {
-      return pg_map[id].name;
+      return pg_map[id]->name;
     }
 
     int GetQuestionID(const std::string& name) {
-      auto iter = std::find_if(pg_map.begin(), pg_map.end(), [name](auto q)-> bool { return q.second.name == name; });
-      return iter != pg_map.end() ? iter->second.id : -1; // or return directly first as id
+      auto iter = std::find_if(pg_map.begin(), pg_map.end(), [name](auto q)-> bool { return q.second->name == name; });
+      return iter != pg_map.end() ? iter->second->id : -1; // or return directly first as id
     }
 
     void PrintDetails(std::ostream& out = std::cout) {
       //std::ostringstream o_str;
       std::for_each(pg_map.begin(), pg_map.end(), [&out](auto q) {
         out
-          << q.second.id << ". " << "Playground id: " << q.second.id << "\tname: " << q.second.name << std::endl;
+          << q.second->id << ". " << "Playground id: " << q.second->id << "\tname: " << q.second->name << std::endl;
           //<< "TesterFunction: " << q.second.run_method.target_type().name() << std::endl;
       });
     }
