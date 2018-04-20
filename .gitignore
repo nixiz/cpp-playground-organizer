@@ -24,7 +24,7 @@
 *.lai
 *.la
 *.a
-*.lib
+#*.lib
 
 # Executables
 *.exe
@@ -34,18 +34,11 @@
 *.opendb
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-[Ss]tatic_Debug/
-x64/
-x86/
-bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-inc/
+*.tlog
+*.log
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -54,3 +47,11 @@ inc/
 .vscode/
 
 *.TMP
+/LibOrganizer/Debug/LibOrganizer.idb
+/LibOrganizer/Debug/LibOrganizer.pdb
+/LibOrganizer/Release/LibOrganizer.pdb
+/LibOrganizer/x64/Debug/LibOrganizer.idb
+/LibOrganizer/x64/Debug/LibOrganizer.pdb
+/LibOrganizer/x64/Release/LibOrganizer.pdb
+/Debug
+/Release
