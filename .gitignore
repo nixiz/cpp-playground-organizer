@@ -55,3 +55,6 @@
 /LibOrganizer/x64/Release/LibOrganizer.pdb
 /Debug
 /Release
+*.idb
+/x64/Debug/vc140.pdb
+*.ilk

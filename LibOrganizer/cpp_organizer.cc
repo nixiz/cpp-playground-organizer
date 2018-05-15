@@ -135,26 +135,26 @@ namespace CppOrganizer
   struct CodeRunnerComp {
     using is_transparent = void; // for example with void,
                                  // but could be int or struct CanSearchOnId;
-    bool operator()(ICodeRunnerIdentifierPtr const& employee1, ICodeRunnerIdentifierPtr const& employee2) const
+    bool operator()(ICodeRunnerIdentifierPtr const& lhs, ICodeRunnerIdentifierPtr const& rhs) const
     {
-      return employee1->getID() < employee2->getID();
+      return lhs->getID() < rhs->getID();
     }
-    bool operator()(int id, ICodeRunnerIdentifierPtr const& employee) const
+    bool operator()(int id, ICodeRunnerIdentifierPtr const& rhs) const
     {
-      return id < employee->getID();
+      return id < rhs->getID();
     }
-    bool operator()(ICodeRunnerIdentifierPtr const& employee, int id) const
+    bool operator()(ICodeRunnerIdentifierPtr const& lhs, int id) const
     {
-      return employee->getID() < id;
+      return lhs->getID() < id;
     }
 
-    bool operator()(const std::string str, ICodeRunnerIdentifierPtr const& employee) const
+    bool operator()(const std::string str, ICodeRunnerIdentifierPtr const& rhs) const
     {
-      return str < employee->getName();
+      return str < rhs->getName();
     }
-    bool operator()(ICodeRunnerIdentifierPtr const& employee, const std::string str) const
+    bool operator()(ICodeRunnerIdentifierPtr const& lhs, const std::string str) const
     {
-      return employee->getName() < str;
+      return lhs->getName() < str;
     }
   };
 

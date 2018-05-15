@@ -25,6 +25,15 @@ int main(int argc, char *argv[]) { \
   return EXIT_SUCCESS; \
 }
 
+#define CREATE_ELEMENT(ClassName)       \
+class ClassName :                       \
+  public CppOrganizer::CodeRunnerHelper<ClassName> {  \
+public:                                 \
+  void Run();                           \
+}
+
+#define ELEMENT_CODE(ClassName) void ClassName::Run()
+
 #define ADD_ELEMENT(ClassName, ...) \
 std::make_shared<ClassName>(__VA_ARGS__)
 
