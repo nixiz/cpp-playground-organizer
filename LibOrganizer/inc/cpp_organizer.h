@@ -37,6 +37,10 @@ public:                                 \
 #define ADD_ELEMENT(ClassName, ...) \
 std::make_shared<ClassName>(__VA_ARGS__)
 
+#define CREATE_ELEMENT_WITH_CODE(ClassName)  \
+CREATE_ELEMENT(ClassName);              \
+ELEMENT_CODE(ClassName)
+
 namespace CppOrganizer
 {
   class PlaygroundOrganizer;
