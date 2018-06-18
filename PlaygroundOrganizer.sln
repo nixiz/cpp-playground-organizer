@@ -10,6 +10,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibOrganizerDemo", "Playgro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LibOrganizer", "LibOrganizer\LibOrganizer.vcxproj", "{325D3717-16FE-4332-B50E-B173EDA4EB63}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeaderOnly", "HeaderOnly\HeaderOnly.vcxproj", "{5EE4B760-C32F-476B-AEB7-DB202F582BB3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +36,14 @@ Global
 		{325D3717-16FE-4332-B50E-B173EDA4EB63}.Release|x64.Build.0 = Release|x64
 		{325D3717-16FE-4332-B50E-B173EDA4EB63}.Release|x86.ActiveCfg = Release|Win32
 		{325D3717-16FE-4332-B50E-B173EDA4EB63}.Release|x86.Build.0 = Release|Win32
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Debug|x64.ActiveCfg = Debug|x64
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Debug|x64.Build.0 = Debug|x64
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Debug|x86.ActiveCfg = Debug|Win32
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Debug|x86.Build.0 = Debug|Win32
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Release|x64.ActiveCfg = Release|x64
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Release|x64.Build.0 = Release|x64
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Release|x86.ActiveCfg = Release|Win32
+		{5EE4B760-C32F-476B-AEB7-DB202F582BB3}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

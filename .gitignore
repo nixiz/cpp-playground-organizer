@@ -58,3 +58,4 @@
 *.idb
 /x64/Debug/vc140.pdb
 *.ilk
+/HeaderOnly/Debug/vc140.pdb
