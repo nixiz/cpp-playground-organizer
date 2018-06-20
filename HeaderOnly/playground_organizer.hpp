@@ -1,6 +1,12 @@
 #ifndef _CPP_Playground_ORGANIZER_HPP_
 #define _CPP_Playground_ORGANIZER_HPP_
 
+#define Stringize( L )     #L 
+#define MakeString( M, L ) M(L)
+#define $Line MakeString( Stringize, __LINE__ )
+#define PrintError __FILE__ "(" $Line ") : Error: "
+#define PrintWarn  __FILE__ "(" $Line ") : Warning: "
+
 #include <memory>
 #include <vector>
 #include <set>
@@ -14,6 +20,7 @@
 #endif // !COMPILE_WITH_UNIMPLEMENTED_RUNNER
 
 #define START_ORGANIZER_MAIN_WITH_OBJS(...) \
+int CppOrganizer::ICodeRunnerIdentifier::quest_id = 0; \
 int main(int argc, char *argv[]) { \
   CppOrganizer::PlaygroundOrganizer po; \
   po.Insert(__VA_ARGS__); \
@@ -40,17 +47,25 @@ std::make_shared<ClassName>(__VA_ARGS__)
 CREATE_ELEMENT(ClassName);              \
 ELEMENT_CODE(ClassName)
 
+#include <assert.h>     /* assert */
 
-namespace colorconsole {
-#ifdef _WIN32
-#include <Windows.h>
+#ifndef _ASSERT_EXPR
+#define _ASSERT_EXPR(a,b) assert(a)
 #endif
 
-#ifdef _WIN32
+#ifndef _ASSERT
+#define _ASSERT(a) assert(a)
+#endif
+
+
+namespace colorconsole {
+
+#ifdef MSBUILD
+#include <Windows.h>
   class ConsoleColorManager {
   public:
     enum Color {
-      default = 0,
+      _default = 0,
       fg_blue = FOREGROUND_BLUE,
       fg_green = FOREGROUND_GREEN,
       fg_red = FOREGROUND_RED,
@@ -80,7 +95,7 @@ namespace colorconsole {
       //printf("Back to normal");
     }
 
-    bool SetConsoleColor(unsigned short color = Color::default) {
+    bool SetConsoleColor(unsigned short color = Color::_default) {
       if (!bInitialized) return false;
       return SetConsoleTextAttribute(hConsole, color) > 0;
     }
@@ -98,10 +113,11 @@ namespace colorconsole {
     bool bInitialized = false;
   };
 #else
+  // TODO(oguzhank): implement for linux and other platforms
   class ConsoleColorManager {
   public:
     enum Color {
-      default,
+      _default,
       fg_blue,
       fg_green,
       fg_red,
@@ -145,7 +161,6 @@ namespace CppOrganizer
     const int id;
     static int quest_id;
   };
-  int ICodeRunnerIdentifier::quest_id = 0;
   typedef std::shared_ptr<ICodeRunnerIdentifier> ICodeRunnerIdentifierPtr;
 
   class CodeExecuteBenchmark {
@@ -159,14 +174,22 @@ namespace CppOrganizer
         ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_green);
         printf("\n __START__ ");
         ccm.Default();
-        printf("%d: %s is starting execute\n", iden_.getID(), iden_.getName().c_str());
+        printf("%d: ", iden_.getID());
+        ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_blue);
+        printf("%s", iden_.getName().c_str());
+        ccm.Default();
+        printf(" is starting execute\n");
         clock::time_point start = clock::now();
         f_();
         duration elapsed = clock::now() - start;
         ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_red);
         printf("\n  __END__  ");
         ccm.Default();
-        printf("%d: %s completed in", iden_.getID(), iden_.getName().c_str());
+        printf("%d: ", iden_.getID());
+        ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_blue);
+        printf("%s", iden_.getName().c_str());
+        ccm.Default();
+        printf(" completed in");
         ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_green);
         printf(" %.2f ", elapsed.count());
         ccm.Default();
@@ -293,4 +316,4 @@ namespace CppOrganizer
 
 }
 
-#endif _CPP_Playground_ORGANIZER_HPP_
+#endif // _CPP_Playground_ORGANIZER_HPP_
