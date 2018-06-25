@@ -67,9 +67,8 @@ CREATE_ELEMENT_WITH_CODE(AsyncSequentialExample) {
 }
 
 START_ORGANIZER_MAIN_WITH_OBJS(
-{
   ADD_ELEMENT(AsyncSequentialExample),
   ADD_ELEMENT(AsyncUsageExample),
-})
+)
 PAUSE_ON_END;
 END_ORGANIZER_MAIN;

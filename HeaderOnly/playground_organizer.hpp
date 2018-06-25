@@ -23,10 +23,10 @@
 int CppOrganizer::ICodeRunnerIdentifier::quest_id = 0; \
 int main(int argc, char *argv[]) { \
   CppOrganizer::PlaygroundOrganizer po; \
-  po.Insert(__VA_ARGS__); \
+  __VA_ARGS__ \
   po.PrintDetails(); \
   po.RunAll(); 
-#define PAUSE_ON_END system("pause");
+#define PAUSE_ON_END system("pause")
 #define END_ORGANIZER_MAIN \
   return EXIT_SUCCESS; \
 }
@@ -35,13 +35,15 @@ int main(int argc, char *argv[]) { \
 class ClassName :                       \
   public CppOrganizer::CodeRunnerHelper<ClassName> {  \
 public:                                 \
+  ClassName() {}                        \
   void Run();                           \
 }
 
 #define ELEMENT_CODE(ClassName) void ClassName::Run()
 
 #define ADD_ELEMENT(ClassName, ...) \
-std::make_shared<ClassName>(__VA_ARGS__)
+po.builder().Add<ClassName>(__VA_ARGS__)
+//std::make_shared<ClassName>(__VA_ARGS__)
 
 #define CREATE_ELEMENT_WITH_CODE(ClassName)  \
 CREATE_ELEMENT(ClassName);              \
@@ -138,6 +140,7 @@ namespace colorconsole {
 
 namespace CppOrganizer
 {
+
   using colorconsole::ConsoleColorManager;
   class PlaygroundOrganizer;
 
@@ -254,30 +257,47 @@ namespace CppOrganizer
       return lhs->getName() < str;
     }
   };
+  typedef std::set<ICodeRunnerIdentifierPtr, CodeRunnerComp> IPlaygroundObjMap;
 
+  // Add helper without using macro
+  //template <class ClassName, typename ...Args>
+  //std::shared_ptr<ClassName> Add(Args&&... args) {
+  //  // ctor'da debug edebilmek için
+  //  return std::shared_ptr<ClassName>(new ClassName(std::forward<Args>(args)...));
+  //  //return std::make_shared<ClassName, Args...>(std::forward<Args>(args)...);
+  //}
+
+  class PlaygroundBuilder {
+  public:
+    PlaygroundBuilder() = default;
+    ~PlaygroundBuilder() = default;
+
+    template <class ClassName, typename ...Args>
+    PlaygroundBuilder& Add(Args&&... args) {
+      m_pg_objects.insert(std::shared_ptr<ClassName>(new ClassName(std::forward<Args>(args)...)));
+      //m_pg_objects.insert(std::make_shared<ClassName, Args...>(std::forward<Args>(args)...));
+      return *this;
+    }
+  private:
+    friend class PlaygroundOrganizer;
+    IPlaygroundObjMap m_pg_objects;
+  };
 
   class PlaygroundOrganizer final {
-    struct PlaygroundOrganizerPimpl {
-      using IPlaygroundObjMap = std::set<ICodeRunnerIdentifierPtr, CodeRunnerComp>;
-      IPlaygroundObjMap m_pg_objects;
-    };
   public:
-    PlaygroundOrganizer() : pimpl_ptr(new PlaygroundOrganizerPimpl()) {
-    }
+    PlaygroundOrganizer() = default;
     
-    ~PlaygroundOrganizer() { }
+    ~PlaygroundOrganizer() = default;
 
-    void Insert(std::initializer_list<ICodeRunnerIdentifierPtr> pg_objects)
-    {
-      // append given objects to the end of vector
-      pimpl_ptr->m_pg_objects.insert(pg_objects);
+    PlaygroundBuilder& builder() {
+      return _builder;
     }
 
     void RunWithID(std::initializer_list<int> pg_ids)
     {
       for (auto id : pg_ids) {
-        auto it = pimpl_ptr->m_pg_objects.find(id);
-        if (it != pimpl_ptr->m_pg_objects.end())
+        auto it = _builder.m_pg_objects.find(id);
+        if (it != _builder.m_pg_objects.end())
         {
           (*it)->RunCode();
         }
@@ -287,23 +307,23 @@ namespace CppOrganizer
     void RunAll()
     {
       std::for_each(
-        pimpl_ptr->m_pg_objects.begin(),
-        pimpl_ptr->m_pg_objects.end(),
+        _builder.m_pg_objects.begin(),
+        _builder.m_pg_objects.end(),
         [](auto const& pg) { pg->RunCode(); });
     }
 
     std::string GetQuestionName(int id) {
-      auto it = pimpl_ptr->m_pg_objects.find(id);
-      return it != pimpl_ptr->m_pg_objects.end() ? (*it)->name : std::string();
+      auto it = _builder.m_pg_objects.find(id);
+      return it != _builder.m_pg_objects.end() ? (*it)->name : std::string();
     }
 
     int GetQuestionIDbyName(const std::string& name) {
-      auto iter = pimpl_ptr->m_pg_objects.find(name);
-      return iter != pimpl_ptr->m_pg_objects.end() ? (*iter)->id : -1; // or return directly first as id
+      auto iter = _builder.m_pg_objects.find(name);
+      return iter != _builder.m_pg_objects.end() ? (*iter)->id : -1; // or return directly first as id
     }
 
     void PrintDetails() {
-      std::for_each(pimpl_ptr->m_pg_objects.begin(), pimpl_ptr->m_pg_objects.end(), [](auto const& q) {
+      std::for_each(_builder.m_pg_objects.begin(), _builder.m_pg_objects.end(), [](auto const& q) {
         printf("\n%d. Playground id: %d\tname: %s", q->id, q->id, q->name.c_str());
         //std::cout
         //  << q->id << ". " << "Playground id: " << q->id << "\tname: " << q->name << std::endl;
@@ -311,7 +331,8 @@ namespace CppOrganizer
     }
 
   private:
-    std::unique_ptr<PlaygroundOrganizerPimpl> pimpl_ptr;
+    //std::unique_ptr<PlaygroundBuilder> builder_ptr;
+    PlaygroundBuilder _builder;
   };
 
 }
