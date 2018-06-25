@@ -1,5 +1,6 @@
 #include "playground_organizer.hpp"
 #include <iostream>
+#include <string>
 #include <algorithm>
 #include <numeric>
 #include <future>
@@ -66,9 +67,25 @@ CREATE_ELEMENT_WITH_CODE(AsyncSequentialExample) {
   std::cout << "Sum of array: " << sum << std::endl;
 }
 
+#ifndef _USE_MAIN_WITH_MACRO_ // custom main with default initialization
+int CppOrganizer::ICodeRunnerIdentifier::quest_id = 0;
+int main(int argc, char *argv[]) {
+  CppOrganizer::PlaygroundOrganizer po;
+  po.builder()
+    .Add<AsyncSequentialExample>()
+    .Add<AsyncUsageExample>();
+  po.PrintDetails();
+  po.RunAll();
+  std::cout << "Press enter to exit programm..";
+  std::string s;
+  std::getline(std::cin, s);
+  return EXIT_SUCCESS;
+}
+#else // use it if you want to main and assign codes created by macros
 START_ORGANIZER_MAIN_WITH_OBJS(
   ADD_ELEMENT(AsyncSequentialExample),
   ADD_ELEMENT(AsyncUsageExample),
 )
 PAUSE_ON_END;
 END_ORGANIZER_MAIN;
+#endif

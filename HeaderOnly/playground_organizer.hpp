@@ -26,7 +26,10 @@ int main(int argc, char *argv[]) { \
   __VA_ARGS__ \
   po.PrintDetails(); \
   po.RunAll(); 
-#define PAUSE_ON_END system("pause")
+#define PAUSE_ON_END \
+std::cout << "Press enter to exit programm.."; \
+std::string s; \
+std::getline(std::cin, s);
 #define END_ORGANIZER_MAIN \
   return EXIT_SUCCESS; \
 }
