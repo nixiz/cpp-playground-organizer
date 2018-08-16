@@ -242,23 +242,25 @@ namespace CppOrganizer
     {
       return lhs->getID() < rhs->getID();
     }
+
     bool operator()(int id, ICodeRunnerIdentifierPtr const& rhs) const
     {
       return id < rhs->getID();
     }
+
     bool operator()(ICodeRunnerIdentifierPtr const& lhs, int id) const
     {
       return lhs->getID() < id;
     }
+    //bool operator()(const std::string str, ICodeRunnerIdentifierPtr const& rhs) const
+    //{
+    //  return str.compare(rhs->getName()) < 0;
+    //}
 
-    bool operator()(const std::string str, ICodeRunnerIdentifierPtr const& rhs) const
-    {
-      return str < rhs->getName();
-    }
-    bool operator()(ICodeRunnerIdentifierPtr const& lhs, const std::string str) const
-    {
-      return lhs->getName() < str;
-    }
+    //bool operator()(ICodeRunnerIdentifierPtr const& lhs, const std::string str) const
+    //{
+    //  return lhs->getName().compare(str) < 0;
+    //}
   };
   typedef std::set<ICodeRunnerIdentifierPtr, CodeRunnerComp> IPlaygroundObjMap;
 
@@ -289,7 +291,7 @@ namespace CppOrganizer
   class PlaygroundOrganizer final {
   public:
     PlaygroundOrganizer() = default;
-    
+
     ~PlaygroundOrganizer() = default;
 
     PlaygroundBuilder& builder() {
@@ -300,6 +302,17 @@ namespace CppOrganizer
     {
       for (auto id : pg_ids) {
         auto it = _builder.m_pg_objects.find(id);
+        if (it != _builder.m_pg_objects.end())
+        {
+          (*it)->RunCode();
+        }
+      }
+    }
+
+    void RunWithName(std::initializer_list<std::string> pg_names)
+    {
+      for (auto name : pg_names) {
+        auto it = findIDbyName(name);
         if (it != _builder.m_pg_objects.end())
         {
           (*it)->RunCode();
@@ -321,7 +334,7 @@ namespace CppOrganizer
     }
 
     int GetQuestionIDbyName(const std::string& name) {
-      auto iter = _builder.m_pg_objects.find(name);
+      auto iter = findIDbyName(name);
       return iter != _builder.m_pg_objects.end() ? (*iter)->id : -1; // or return directly first as id
     }
 
@@ -334,7 +347,12 @@ namespace CppOrganizer
     }
 
   private:
-    //std::unique_ptr<PlaygroundBuilder> builder_ptr;
+    inline IPlaygroundObjMap::const_iterator findIDbyName(const std::string& name) {
+      auto res = std::find_if(_builder.m_pg_objects.begin(), _builder.m_pg_objects.end(), [name](const ICodeRunnerIdentifierPtr& item) {
+        return item->getName().compare(name) == 0;
+      });
+      return res;
+    }
     PlaygroundBuilder _builder;
   };
 
