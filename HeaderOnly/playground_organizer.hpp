@@ -1,6 +1,7 @@
 #ifndef _CPP_Playground_ORGANIZER_HPP_
 #define _CPP_Playground_ORGANIZER_HPP_
 
+#define MSTRING( L )  Stringize(L) 
 #define Stringize( L )     #L 
 #define MakeString( M, L ) M(L)
 #define $Line MakeString( Stringize, __LINE__ )
@@ -14,6 +15,7 @@
 #include <chrono>
 #include <thread>
 #include <functional>
+#include <type_traits>
 
 #ifndef COMPILE_WITH_UNIMPLEMENTED_RUNNER
 #define COMPILE_WITH_UNIMPLEMENTED_RUNNER 1
@@ -40,6 +42,8 @@ class ClassName :                       \
 public:                                 \
   ClassName() {}                        \
   void Run();                           \
+  constexpr const char* name() const  { \
+    return MSTRING(ClassName); }        \
 }
 
 #define ELEMENT_CODE(ClassName) void ClassName::Run()
@@ -65,7 +69,7 @@ ELEMENT_CODE(ClassName)
 
 namespace colorconsole {
 
-#ifdef MSBUILD
+#ifdef _WIN32
 #include <Windows.h>
   class ConsoleColorManager {
   public:
@@ -150,7 +154,7 @@ namespace CppOrganizer
   class ICodeRunnerIdentifier {
     friend class PlaygroundOrganizer;
   public:
-    explicit ICodeRunnerIdentifier(const std::string& _name) :
+    explicit ICodeRunnerIdentifier(const char* _name) :
       id(quest_id++), name(_name) { }
 
     std::string getName() const {
@@ -171,7 +175,9 @@ namespace CppOrganizer
 
   class CodeExecuteBenchmark {
   public:
-    explicit CodeExecuteBenchmark(std::function<void()> f, const ICodeRunnerIdentifier& iden) : f_(f), iden_(iden) {
+    template <typename Fun>
+    explicit CodeExecuteBenchmark(const Fun& func, const ICodeRunnerIdentifier& iden_) 
+    {
       using clock = std::chrono::high_resolution_clock;
       using duration = std::chrono::duration<double, std::milli>;
       ConsoleColorManager ccm;
@@ -186,7 +192,7 @@ namespace CppOrganizer
         ccm.Default();
         printf(" is starting execute\n");
         clock::time_point start = clock::now();
-        f_();
+        func();
         duration elapsed = clock::now() - start;
         ccm.SetConsoleColor(ConsoleColorManager::fg_intensified | ConsoleColorManager::fg_red);
         printf("\n  __END__  ");
@@ -213,14 +219,16 @@ namespace CppOrganizer
     ~CodeExecuteBenchmark() {
     }
   private:
-    std::function<void()> f_;
-    const ICodeRunnerIdentifier& iden_;
+    //std::function<void()> f_;
+    //const ICodeRunnerIdentifier& iden_;
   };
 
   template <class T>
   class CodeRunnerHelper : public ICodeRunnerIdentifier {
   public:
-    CodeRunnerHelper(const std::string& testName = typeid(T).name()) : ICodeRunnerIdentifier(testName) { }
+    // CodeRunnerHelper(const std::string& testName = typeid(T).name()) : ICodeRunnerIdentifier(testName) { }
+    CodeRunnerHelper() : 
+      ICodeRunnerIdentifier(static_cast<T const*>(this)->name()) { }
     virtual ~CodeRunnerHelper() {};
 
     void RunCode() override {
@@ -267,7 +275,7 @@ namespace CppOrganizer
   // Add helper without using macro
   //template <class ClassName, typename ...Args>
   //std::shared_ptr<ClassName> Add(Args&&... args) {
-  //  // ctor'da debug edebilmek için
+  //  // ctor'da debug edebilmek iï¿½in
   //  return std::shared_ptr<ClassName>(new ClassName(std::forward<Args>(args)...));
   //  //return std::make_shared<ClassName, Args...>(std::forward<Args>(args)...);
   //}
@@ -339,10 +347,9 @@ namespace CppOrganizer
     }
 
     void PrintDetails() {
+      printf("available items:");
       std::for_each(_builder.m_pg_objects.begin(), _builder.m_pg_objects.end(), [](auto const& q) {
-        printf("\n%d. Playground id: %d\tname: %s", q->id, q->id, q->name.c_str());
-        //std::cout
-        //  << q->id << ". " << "Playground id: " << q->id << "\tname: " << q->name << std::endl;
+        printf("\n%02d-name: %s", q->id, q->name.c_str());
       });
     }
 
